@@ -4,6 +4,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -15,8 +18,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-// TODO ch09 : DataIntegrityViolationException -> 409 (ex. supprimer un auteur qui a des livres) ;
-// PropertyReferenceException et InvalidDataAccessApiUsageException (tri inconnu) -> 400.
 @RestControllerAdvice
 public class GestionnaireErreurs extends ResponseEntityExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GestionnaireErreurs.class);
@@ -31,22 +32,32 @@ public class GestionnaireErreurs extends ResponseEntityExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
     }
 
-    @Override                                              // échec de @Valid
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ProblemDetail contrainteViolee(DataIntegrityViolationException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Donnée en conflit avec une donnée existante");
+    }
+
+    // Un ?sort=... sur un attribut qui n'existe pas
+    @ExceptionHandler({PropertyReferenceException.class, InvalidDataAccessApiUsageException.class})
+    public ProblemDetail requeteInvalide(RuntimeException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Paramètres de recherche ou de tri invalides");
+    }
+
+    @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e,
             HttpHeaders headers, HttpStatusCode status, WebRequest requete) {
         ProblemDetail pb = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
                 "Les données envoyées sont invalides");
         Map<String, String> erreurs = new LinkedHashMap<>();
-        e.getBindingResult().getFieldErrors()                 // un message par champ (le premier)
+        e.getBindingResult().getFieldErrors()
                 .forEach(f -> erreurs.putIfAbsent(f.getField(), f.getDefaultMessage()));
         pb.setProperty("erreurs", erreurs);
         return handleExceptionInternal(e, pb, headers, status, requete);
     }
 
-    @ExceptionHandler(Exception.class)                     // le filet de sécurité, en dernier recours
+    @ExceptionHandler(Exception.class)
     public ProblemDetail inattendue(Exception e) {
-        log.error("Erreur inattendue", e);                     // le détail va dans le journal...
-        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
-                "Erreur interne");                             // ... pas au client
+        log.error("Erreur inattendue", e);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur interne");
     }
 }

@@ -1,8 +1,19 @@
 package sn.ucad.biblioapi.emprunt;
 
-// TODO ch09 : JpaRepository<Emprunt, Long> avec
-//   existsByLivreIdAndDateRetourIsNull(Long livreId)      — le livre est-il sorti ?
-//   countByAdherentIdAndDateRetourIsNull(Long adherentId) — emprunts en cours de l'adhérent
-//   retardsAu(LocalDate date) (exercice 9.2) — non rendus, date prévue dépassée, avec livre et adhérent
-public interface EmpruntRepository {
+import java.time.LocalDate;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+public interface EmpruntRepository extends JpaRepository<Emprunt, Long> {
+
+    boolean existsByLivreIdAndDateRetourIsNull(Long livreId);
+
+    long countByAdherentIdAndDateRetourIsNull(Long adherentId);
+
+    @Query("""
+            select e from Emprunt e join fetch e.livre join fetch e.adherent
+            where e.dateRetour is null and e.dateRetourPrevue < :date
+            """)
+    List<Emprunt> retardsAu(LocalDate date);
 }

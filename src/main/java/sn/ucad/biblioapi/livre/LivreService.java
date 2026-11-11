@@ -1,14 +1,13 @@
 package sn.ucad.biblioapi.livre;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sn.ucad.biblioapi.commun.ConflitException;
+import sn.ucad.biblioapi.commun.PageReponse;
 import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 
-// TODO ch09 (étape 5) : rechercher(titre, auteur, annee, pageable) -> PageReponse<LivreReponse>.
-// Avec open-in-view=false, renvoyer des LivreReponse construits DANS la transaction
-// (parId, creer, modifier), comme EmpruntService.
 @Service
 @Transactional(readOnly = true)
 public class LivreService {
@@ -18,36 +17,38 @@ public class LivreService {
         this.depot = depot;
     }
 
-    public List<Livre> tous() {
-        return depot.findAll();
+    public PageReponse<LivreReponse> rechercher(String titre, String auteur, Integer annee, Pageable pageable) {
+        Page<LivreReponse> page = depot.rechercher(titre, auteur, annee, pageable).map(LivreReponse::depuis);
+        return new PageReponse<>(page.getContent(), page.getNumber(), page.getSize(),
+                page.getTotalElements(), page.getTotalPages());
     }
 
-    public List<Livre> rechercher(String motDansTitre) {
-        return depot.findByTitreContainingIgnoreCase(motDansTitre);
-    }
-
-    public Livre parId(Long id) {
-        return depot.findById(id)
-                .orElseThrow(() -> new RessourceIntrouvableException("Livre " + id + " introuvable"));
+    public LivreReponse parId(Long id) {
+        return LivreReponse.depuis(trouver(id));
     }
 
     @Transactional
-    public Livre creer(String isbn, String titre, Integer annee) {
+    public LivreReponse creer(String isbn, String titre, Integer annee) {
         if (depot.existsByIsbn(isbn)) {
             throw new ConflitException("L'ISBN " + isbn + " est déjà utilisé");
         }
-        return depot.save(new Livre(isbn, titre, annee));
+        return LivreReponse.depuis(depot.save(new Livre(isbn, titre, annee)));
     }
 
     @Transactional
-    public Livre modifier(Long id, String titre, Integer annee) {
-        Livre livre = parId(id);
-        livre.modifier(titre, annee);           // entité suivie : mise à jour à la fin de la transaction
-        return livre;
+    public LivreReponse modifier(Long id, String titre, Integer annee) {
+        Livre livre = trouver(id);
+        livre.modifier(titre, annee);
+        return LivreReponse.depuis(livre);
     }
 
     @Transactional
     public void supprimer(Long id) {
-        depot.delete(parId(id));
+        depot.delete(trouver(id));
+    }
+
+    private Livre trouver(Long id) {
+        return depot.findById(id)
+                .orElseThrow(() -> new RessourceIntrouvableException("Livre " + id + " introuvable"));
     }
 }

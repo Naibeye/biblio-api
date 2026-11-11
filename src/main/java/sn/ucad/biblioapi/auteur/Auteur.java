@@ -1,9 +1,34 @@
 package sn.ucad.biblioapi.auteur;
 
-// TODO ch09 (TP 6, étape 1) : transformer ce record en entité JPA : id généré, nom obligatoire
-// (100 caractères), nationalité ; getters et méthode renommer(nom).
-public record Auteur(Long id, String nom, String nationalite) {
-    public Auteur avecId(Long nouvelId) {
-        return new Auteur(nouvelId, nom, nationalite);
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
+public class Auteur {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 100)
+    private String nom;
+
+    private String nationalite;
+
+    protected Auteur() { }
+
+    public Auteur(String nom, String nationalite) {
+        this.nom = nom;
+        this.nationalite = nationalite;
+    }
+
+    public Long getId() { return id; }
+    public String getNom() { return nom; }
+    public String getNationalite() { return nationalite; }
+
+    public void renommer(String nom) {
+        this.nom = nom;
     }
 }

@@ -1,13 +1,16 @@
 package sn.ucad.biblioapi.emprunt;
 
-import java.time.LocalDate;
+import jakarta.validation.Valid;
+import java.net.URI;
+import java.util.List;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import sn.ucad.biblioapi.adherent.Categorie;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-// TODO ch09 : POST /api/emprunts (201 + Location), POST /api/emprunts/{id}/retour,
-// GET /api/emprunts/retards ; la route date-retour disparaît.
 @RestController
 public class EmpruntController {
     private final EmpruntService service;
@@ -16,8 +19,21 @@ public class EmpruntController {
         this.service = service;
     }
 
-    @GetMapping("/api/emprunts/date-retour")       // ?categorie=ENSEIGNANT
-    public LocalDate dateRetour(@RequestParam(defaultValue = "ETUDIANT") Categorie categorie) {
-        return service.dateRetourPrevue(categorie);
+    @PostMapping("/api/emprunts")
+    public ResponseEntity<EmpruntReponse> emprunter(@Valid @RequestBody EmpruntRequete requete) {
+        EmpruntReponse e = service.emprunter(requete.livreId(), requete.adherentId());
+        URI adresse = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(e.id()).toUri();
+        return ResponseEntity.created(adresse).body(e);
+    }
+
+    @PostMapping("/api/emprunts/{id}/retour")
+    public RetourReponse rendre(@PathVariable Long id) {
+        return service.rendre(id);
+    }
+
+    @GetMapping("/api/emprunts/retards")
+    public List<EmpruntReponse> retards() {
+        return service.retards();
     }
 }

@@ -2,10 +2,11 @@ package sn.ucad.biblioapi.auteur;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 
-// TODO ch09 : service transactionnel sur le dépôt JPA (renommer modifie l'entité suivie).
 @Service
+@Transactional(readOnly = true)
 public class AuteurService {
     private final AuteurRepository depot;
 
@@ -14,27 +15,30 @@ public class AuteurService {
     }
 
     public List<AuteurReponse> tous(String nationalite) {
-        return depot.findAll().stream()
-                .filter(a -> nationalite == null || nationalite.equalsIgnoreCase(a.nationalite()))
-                .map(AuteurReponse::depuis)
-                .toList();
+        List<Auteur> auteurs = nationalite == null ? depot.findAll()
+                : depot.findByNationaliteIgnoreCase(nationalite);
+        return auteurs.stream().map(AuteurReponse::depuis).toList();
     }
 
     public AuteurReponse parId(Long id) {
         return AuteurReponse.depuis(trouver(id));
     }
 
+    @Transactional
     public AuteurReponse creer(String nom, String nationalite) {
-        return AuteurReponse.depuis(depot.save(new Auteur(null, nom, nationalite)));
+        return AuteurReponse.depuis(depot.save(new Auteur(nom, nationalite)));
     }
 
+    @Transactional
     public AuteurReponse renommer(Long id, String nom) {
         Auteur a = trouver(id);
-        return AuteurReponse.depuis(depot.save(new Auteur(id, nom, a.nationalite())));
+        a.renommer(nom);
+        return AuteurReponse.depuis(a);
     }
 
+    @Transactional
     public void supprimer(Long id) {
-        depot.deleteById(trouver(id).id());
+        depot.delete(trouver(id));
     }
 
     private Auteur trouver(Long id) {

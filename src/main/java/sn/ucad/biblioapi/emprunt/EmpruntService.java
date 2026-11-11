@@ -2,26 +2,64 @@ package sn.ucad.biblioapi.emprunt;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.stereotype.Service;
-import sn.ucad.biblioapi.adherent.Categorie;
+import org.springframework.transaction.annotation.Transactional;
+import sn.ucad.biblioapi.adherent.Adherent;
+import sn.ucad.biblioapi.adherent.AdherentRepository;
+import sn.ucad.biblioapi.commun.ConflitException;
+import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
+import sn.ucad.biblioapi.livre.Livre;
+import sn.ucad.biblioapi.livre.LivreRepository;
 
-// TODO ch09 (TP 6, étape 2) : remplacer dateRetourPrevue par les vraies opérations, transactionnelles :
-//   EmpruntReponse emprunter(Long livreId, Long adherentId) — livre (verrouillé) et adhérent existants,
-//     livre pas déjà sorti, limite d'emprunts de la catégorie, date de retour selon la règle ;
-//   RetourReponse rendre(Long empruntId) — jours de retard et pénalité de la catégorie ;
-//   List<EmpruntReponse> retards() (exercice 9.2).
-// Dépendances : EmpruntRepository, LivreRepository, AdherentRepository, EmpruntProperties, Clock.
 @Service
+@Transactional(readOnly = true)
 public class EmpruntService {
+    private final EmpruntRepository emprunts;
+    private final LivreRepository livres;
+    private final AdherentRepository adherents;
     private final EmpruntProperties regles;
     private final Clock horloge;
 
-    public EmpruntService(EmpruntProperties regles, Clock horloge) {
+    public EmpruntService(EmpruntRepository emprunts, LivreRepository livres,
+                          AdherentRepository adherents, EmpruntProperties regles, Clock horloge) {
+        this.emprunts = emprunts;
+        this.livres = livres;
+        this.adherents = adherents;
         this.regles = regles;
         this.horloge = horloge;
     }
 
-    public LocalDate dateRetourPrevue(Categorie categorie) {
-        return LocalDate.now(horloge).plusDays(regles.pour(categorie).dureeJours());
+    @Transactional                                   // tout ou rien
+    public EmpruntReponse emprunter(Long livreId, Long adherentId) {
+        // Verrou sur la ligne du livre : deux emprunts simultanés du même livre passent l'un après l'autre.
+        Livre livre = livres.findByIdPourMiseAJour(livreId)
+                .orElseThrow(() -> new RessourceIntrouvableException("Livre " + livreId + " introuvable"));
+        Adherent adherent = adherents.findById(adherentId)
+                .orElseThrow(() -> new RessourceIntrouvableException("Adhérent " + adherentId + " introuvable"));
+        EmpruntProperties.Regle regle = regles.pour(adherent.getCategorie());
+
+        if (emprunts.existsByLivreIdAndDateRetourIsNull(livreId)) {
+            throw new ConflitException("Ce livre est déjà emprunté");
+        }
+        long enCours = emprunts.countByAdherentIdAndDateRetourIsNull(adherentId);
+        if (enCours >= regle.maxEmprunts()) {
+            throw new ConflitException("Limite de " + regle.maxEmprunts() + " emprunts atteinte");
+        }
+        Emprunt e = emprunts.save(new Emprunt(livre, adherent, LocalDate.now(horloge), regle.dureeJours()));
+        return EmpruntReponse.depuis(e);             // le DTO est construit DANS la transaction
+    }
+
+    @Transactional
+    public RetourReponse rendre(Long empruntId) {
+        Emprunt e = emprunts.findById(empruntId)
+                .orElseThrow(() -> new RessourceIntrouvableException("Emprunt " + empruntId + " introuvable"));
+        long retard = e.rendre(LocalDate.now(horloge));      // pas de save() : l'entité est suivie
+        double penalite = retard * regles.pour(e.getAdherent().getCategorie()).penaliteParJour();
+        return new RetourReponse(EmpruntReponse.depuis(e), retard, penalite);
+    }
+
+    public List<EmpruntReponse> retards() {
+        return emprunts.retardsAu(LocalDate.now(horloge)).stream().map(EmpruntReponse::depuis).toList();
     }
 }
