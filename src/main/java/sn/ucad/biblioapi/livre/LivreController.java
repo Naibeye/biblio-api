@@ -1,28 +1,20 @@
 package sn.ucad.biblioapi.livre;
 
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/api/livres")        // préfixe commun à toutes les méthodes de la classe
 public class LivreController {
-    private static final Logger log = LoggerFactory.getLogger(LivreController.class);
     private final LivreService service;
 
     public LivreController(LivreService service) {
         this.service = service;
-        log.info("4. Construction de LivreController");
     }
 
-    @GetMapping("/api/livres")
-    public List<Livre> lister() {
-        return service.tous();
-    }
-
-    @GetMapping("/api/livres/instance")       // le même numéro à chaque appel : un seul objet
-    public String instance() {
-        return "LivreService n°" + Integer.toHexString(System.identityHashCode(service));
-    }
+    // TODO ch06 : GET    /api/livres?titre=...  -> 200 et la liste (filtre facultatif)
+    // TODO ch06 : GET    /api/livres/{id}       -> 200 et le livre, ou 404 (ResponseEntity)
+    // TODO ch06 : POST   /api/livres            -> 201, en-tête Location et le livre créé
+    // TODO ch06 : PUT    /api/livres/{id}       -> 200 et le livre remplacé, ou 404
+    // TODO ch06 : DELETE /api/livres/{id}       -> 204, ou 404
 }
