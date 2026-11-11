@@ -12,6 +12,7 @@ public class EmpruntController {
         this.service = service;
     }
 
+    // TODO ch05 (TP 2 bis, étape 1) : paramètre ?categorie=ENSEIGNANT (ETUDIANT par défaut)
     @GetMapping("/api/emprunts/date-retour")
     public LocalDate dateRetour() {
         return service.dateRetourPrevue();

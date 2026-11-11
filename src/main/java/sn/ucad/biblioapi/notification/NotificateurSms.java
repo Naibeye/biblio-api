@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+// TODO ch05 (TP 2 bis, étape 7) : créer ce bean seulement si biblio.notification.canal=sms
 @Component
 public class NotificateurSms implements Notificateur {
     private static final Logger log = LoggerFactory.getLogger(NotificateurSms.class);

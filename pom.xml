@@ -30,6 +30,7 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
+		<!-- TODO ch05 (TP 2 bis, étape 1) : ajouter spring-boot-starter-validation (et spring-boot-starter-validation-test) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>

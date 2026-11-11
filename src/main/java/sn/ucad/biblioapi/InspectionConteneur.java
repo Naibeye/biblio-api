@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+// TODO ch05 (TP 2 bis, étape 6) : ne créer cette classe qu'en profil dev
 public class InspectionConteneur {
     private static final Logger log = LoggerFactory.getLogger(InspectionConteneur.class);
 
