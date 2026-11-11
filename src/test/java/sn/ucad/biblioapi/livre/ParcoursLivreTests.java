@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-// TODO ch11 : créer un livre demande le rôle BIBLIOTHECAIRE (@WithMockUser).
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -23,6 +23,7 @@ class ParcoursLivreTests {
     @Autowired MockMvc mvc;
 
     @Test
+    @WithMockUser(roles = "BIBLIOTHECAIRE")
     void creer_puis_relire_un_livre() throws Exception {
         String adresse = mvc.perform(post("/api/livres")
                         .contentType(MediaType.APPLICATION_JSON)

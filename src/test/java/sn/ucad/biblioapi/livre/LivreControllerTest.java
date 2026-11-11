@@ -3,6 +3,7 @@ package sn.ucad.biblioapi.livre;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -12,16 +13,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sn.ucad.biblioapi.commun.ConflitException;
 import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
+import sn.ucad.biblioapi.securite.SecuriteConfig;
 
-// TODO ch11 (TP 8a, étape 5) : importer SecuriteConfig, profil « test » ; @WithMockUser(roles =
-// "BIBLIOTHECAIRE") sur les tests qui créent ; ajouter les tests 401 (anonyme), 403 (adhérent)
-// et 204 (bibliothécaire) sur DELETE /api/livres/1.
 @WebMvcTest(LivreController.class)
+// TODO ch11 (TP 8b, étape 5) : importer aussi JwtConfig
+@Import(SecuriteConfig.class)
+@ActiveProfiles("test")
 class LivreControllerTest {
 
     @Autowired MockMvc mvc;
@@ -47,6 +52,7 @@ class LivreControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "BIBLIOTHECAIRE")
     void creer_un_livre_sans_titre_renvoie_400() throws Exception {
         mvc.perform(post("/api/livres")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -59,6 +65,24 @@ class LivreControllerTest {
     }
 
     @Test
+    void un_anonyme_ne_peut_pas_supprimer() throws Exception {
+        mvc.perform(delete("/api/livres/1")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADHERENT")
+    void un_adherent_ne_peut_pas_supprimer() throws Exception {
+        mvc.perform(delete("/api/livres/1")).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "BIBLIOTHECAIRE")
+    void un_bibliothecaire_peut_supprimer() throws Exception {
+        mvc.perform(delete("/api/livres/1")).andExpect(status().isNoContent());
+    }
+
+    @Test
+    @WithMockUser(roles = "BIBLIOTHECAIRE")
     void creer_renvoie_201_et_l_adresse() throws Exception {
         when(service.creer("978-2-7777", "Une si longue lettre", 1979))
                 .thenReturn(new LivreReponse(3L, "978-2-7777", "Une si longue lettre", 1979, false));
@@ -72,6 +96,7 @@ class LivreControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "BIBLIOTHECAIRE")
     void un_isbn_deja_pris_renvoie_409() throws Exception {
         when(service.creer(any(), any(), any())).thenThrow(new ConflitException("L'ISBN est déjà utilisé"));
 

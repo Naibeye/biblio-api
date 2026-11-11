@@ -19,8 +19,8 @@ INSERT INTO livre (isbn, titre, annee, auteur_id) VALUES ('978-2-07-040321-9', '
 INSERT INTO adherent (nom, email, categorie) VALUES ('Amina', 'amina@ucad.sn', 'ETUDIANT');
 INSERT INTO adherent (nom, email, categorie) VALUES ('Hassan', 'hassan@ucad.sn', 'ENSEIGNANT');
 
--- TODO ch11 (TP 8a, étape 2) : les comptes de démonstration (table utilisateur : identifiant,
--- empreinte, role). Mots de passe amina-2026, moussa-2026, hassan-2026 ; empreintes BCrypt :
---   amina@ucad.sn  ADHERENT        $2a$10$UuNaL5o89IXDlOGS9jYRbuA4vMxN8KX6tB3tLjttEPZX4pLsV/ity
---   moussa@ucad.sn BIBLIOTHECAIRE  $2a$10$v4HDyrMtnpfb97z2koL90eDbDWA54ISgcvhKPmssdScscvOlmiHfW
---   hassan@ucad.sn ADHERENT        $2a$10$.ZIQ7AYmddgTLCCikS8b9eMYWx24igb2pBCfi1uTvpAay8q8YbqGu
+-- Comptes de démonstration. Mots de passe : amina-2026, moussa-2026, hassan-2026 (empreintes BCrypt)
+INSERT INTO utilisateur (identifiant, empreinte, role) VALUES
+  ('amina@ucad.sn',  '$2a$10$UuNaL5o89IXDlOGS9jYRbuA4vMxN8KX6tB3tLjttEPZX4pLsV/ity', 'ADHERENT'),
+  ('moussa@ucad.sn', '$2a$10$v4HDyrMtnpfb97z2koL90eDbDWA54ISgcvhKPmssdScscvOlmiHfW', 'BIBLIOTHECAIRE'),
+  ('hassan@ucad.sn', '$2a$10$.ZIQ7AYmddgTLCCikS8b9eMYWx24igb2pBCfi1uTvpAay8q8YbqGu', 'ADHERENT');

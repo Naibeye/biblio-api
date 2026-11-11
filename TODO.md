@@ -1,26 +1,18 @@
-# Chapitre 11 — Sécuriser l'API : Spring Security et JWT (2 séances)
+# Chapitre 11 — Séance 2 — TP 8b : des jetons JWT (1 h 15)
 
-Point de départ : la fin du chapitre 10.
+Point de départ : la fin du TP 8a (authentification Basic, rôles, utilisateurs en base).
+Les règles d'accès ne changent pas ; on ajoute une seconde manière de s'authentifier.
 
-## Séance 1 — TP 8a : sécuriser BiblioAPI avec des rôles (1 h)
-- [ ] 1. Ajouter `spring-boot-starter-security` et `spring-boot-starter-security-test` ;
-      constater que tout renvoie 401, y compris certains tests du TP 7.
-- [ ] 2. Écrire `Role`, l'entité `Utilisateur`, son dépôt et `UtilisateursEnBase`
-      (`UserDetailsService`) ; insérer les comptes de démonstration dans `data.sql`
-      (empreintes BCrypt fournies en commentaire).
-- [ ] 3. Écrire `SecuriteConfig` : refuser par défaut (`denyAll()`), catalogue en lecture ouvert,
-      gestion réservée au rôle BIBLIOTHECAIRE, emprunts pour les personnes connectées, `httpBasic`,
-      BCrypt. Vérifier au `curl` les cas 200, 401, 403, 204 ; un adhérent reçoit 403 sur
-      `POST /api/auteurs`. Ouvrir la console H2 en dev (`ConsoleH2Config`).
-- [ ] 4. Retirer `adherentId` de `EmpruntRequete` : l'adhérent est la personne connectée.
-      Amina ne peut pas rendre l'emprunt d'un autre (404) ; ajouter `GET /api/moi/emprunts`.
-- [ ] 5. Adapter les tests du TP 7 (`@WithMockUser`, `@ActiveProfiles("test")`,
-      `@Import(SecuriteConfig.class)`) ; ajouter les trois tests 401 / 403 / 204.
-
-Comptes de démonstration : `amina@ucad.sn` / `amina-2026` (adhérente),
-`moussa@ucad.sn` / `moussa-2026` (bibliothécaire), `hassan@ucad.sn` / `hassan-2026` (adhérent).
-
-## Séance 2 — TP 8b : des jetons JWT (1 h 15)
-Point de départ : la fin du TP 8a (étiquette `ch11-tp8a`). Les TODO de cette séance y sont posés.
+- [ ] 1. Ajouter `spring-boot-starter-security-oauth2-resource-server` (et son `-test`) ; définir
+      `JWT_SECRET` (ou utiliser la clé de repli du profil dev). Clé : `biblio.jwt.secret`.
+- [ ] 2. Écrire `JwtConfig` (clé HMAC de 32 octets au moins, encodeur, décodeur qui vérifie
+      l'émetteur `biblio-api`, rôles lus dans la revendication `roles`) et `JetonController`
+      (`POST /api/auth/jeton`, valable 1 h) ; ajouter `oauth2ResourceServer` à la chaîne de filtres.
+- [ ] 3. Obtenir un jeton (`curl -u moussa@ucad.sn:moussa-2026 -X POST .../api/auth/jeton`) ;
+      décoder son contenu avec `base64 -d` ; l'utiliser pour emprunter (`-H "Authorization: Bearer ..."`).
+- [ ] 4. Vérifier qu'un jeton présenté à `/api/auth/jeton` est refusé (403), qu'un jeton modifié
+      au milieu du contenu est refusé (401), et qu'une clé de 10 caractères empêche le démarrage.
+- [ ] 5. Mettre à jour les tests (`@Import({SecuriteConfig.class, JwtConfig.class})`, clé de test) ;
+      `./mvnw test` doit être vert.
 
 Endroits à compléter : `grep -rn "TODO ch11" src pom.xml`

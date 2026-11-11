@@ -24,8 +24,6 @@ import sn.ucad.biblioapi.commun.ConflitException;
 import sn.ucad.biblioapi.livre.Livre;
 import sn.ucad.biblioapi.livre.LivreRepository;
 
-// TODO ch11 : adapter à emprunter(livreId, email) et rendre(empruntId, utilisateur, bibliothecaire) ;
-// ajouter on_ne_rend_pas_l_emprunt_d_un_autre.
 @ExtendWith(MockitoExtension.class)
 class EmpruntServiceTest {
 
@@ -51,10 +49,10 @@ class EmpruntServiceTest {
     @Test
     void emprunter_fixe_la_date_de_retour_a_14_jours_pour_un_etudiant() {
         when(livres.findByIdPourMiseAJour(1L)).thenReturn(Optional.of(livre));
-        when(adherents.findById(7L)).thenReturn(Optional.of(amina));
+        when(adherents.findByEmail("amina@ucad.sn")).thenReturn(Optional.of(amina));
         when(emprunts.save(any(Emprunt.class))).thenAnswer(appel -> appel.getArgument(0));
 
-        EmpruntReponse e = service.emprunter(1L, 7L);
+        EmpruntReponse e = service.emprunter(1L, "amina@ucad.sn");
 
         assertThat(e.dateRetourPrevue()).isEqualTo(LocalDate.of(2026, 3, 15));
     }
@@ -62,10 +60,10 @@ class EmpruntServiceTest {
     @Test
     void refuse_un_livre_deja_emprunte() {
         when(livres.findByIdPourMiseAJour(1L)).thenReturn(Optional.of(livre));
-        when(adherents.findById(7L)).thenReturn(Optional.of(amina));
+        when(adherents.findByEmail("amina@ucad.sn")).thenReturn(Optional.of(amina));
         when(emprunts.existsByLivreIdAndDateRetourIsNull(1L)).thenReturn(true);
 
-        assertThatThrownBy(() -> service.emprunter(1L, 7L))
+        assertThatThrownBy(() -> service.emprunter(1L, "amina@ucad.sn"))
                 .isInstanceOf(ConflitException.class)
                 .hasMessageContaining("déjà emprunté");
         verify(emprunts, never()).save(any());
@@ -76,19 +74,28 @@ class EmpruntServiceTest {
         Emprunt e = new Emprunt(livre, amina, LocalDate.of(2026, 2, 12), 14);   // retour prévu le 26/02
         when(emprunts.findById(5L)).thenReturn(Optional.of(e));
 
-        RetourReponse r = service.rendre(5L);
+        RetourReponse r = service.rendre(5L, "amina@ucad.sn", false);
 
         assertThat(r.joursDeRetard()).isEqualTo(3);
         assertThat(r.penalite()).isEqualTo(1500.0);
     }
 
     @Test
+    void on_ne_rend_pas_l_emprunt_d_un_autre() {
+        Emprunt e = new Emprunt(livre, amina, LocalDate.of(2026, 2, 20), 14);
+        when(emprunts.findById(5L)).thenReturn(Optional.of(e));
+
+        assertThatThrownBy(() -> service.rendre(5L, "hassan@ucad.sn", false))
+                .hasMessageContaining("introuvable");
+    }
+
+    @Test
     void refuse_au_dela_de_la_limite() {
         when(livres.findByIdPourMiseAJour(1L)).thenReturn(Optional.of(livre));
-        when(adherents.findById(7L)).thenReturn(Optional.of(amina));
+        when(adherents.findByEmail("amina@ucad.sn")).thenReturn(Optional.of(amina));
         when(emprunts.countByAdherentIdAndDateRetourIsNull(any())).thenReturn(3L);
 
-        assertThatThrownBy(() -> service.emprunter(1L, 7L))
+        assertThatThrownBy(() -> service.emprunter(1L, "amina@ucad.sn"))
                 .isInstanceOf(ConflitException.class)
                 .hasMessageContaining("Limite de 3 emprunts");
     }
@@ -97,10 +104,11 @@ class EmpruntServiceTest {
     void un_enseignant_garde_le_livre_28_jours() {
         Adherent hassan = new Adherent("Hassan", "hassan@ucad.sn", Categorie.ENSEIGNANT);
         when(livres.findByIdPourMiseAJour(1L)).thenReturn(Optional.of(livre));
-        when(adherents.findById(8L)).thenReturn(Optional.of(hassan));
+        when(adherents.findByEmail("hassan@ucad.sn")).thenReturn(Optional.of(hassan));
         when(emprunts.save(any(Emprunt.class))).thenAnswer(appel -> appel.getArgument(0));
 
-        assertThat(service.emprunter(1L, 8L).dateRetourPrevue()).isEqualTo(LocalDate.of(2026, 3, 29));
+        assertThat(service.emprunter(1L, "hassan@ucad.sn").dateRetourPrevue())
+                .isEqualTo(LocalDate.of(2026, 3, 29));
     }
 
     @Test
@@ -109,7 +117,7 @@ class EmpruntServiceTest {
         Emprunt e = new Emprunt(livre, hassan, LocalDate.of(2026, 1, 20), 28);   // prévu le 17/02
         when(emprunts.findById(5L)).thenReturn(Optional.of(e));
 
-        RetourReponse r = service.rendre(5L);
+        RetourReponse r = service.rendre(5L, "hassan@ucad.sn", false);
 
         assertThat(r.joursDeRetard()).isEqualTo(12);
         assertThat(r.penalite()).isZero();

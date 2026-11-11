@@ -12,10 +12,6 @@ import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 import sn.ucad.biblioapi.livre.Livre;
 import sn.ucad.biblioapi.livre.LivreRepository;
 
-// TODO ch11 (TP 8a, étape 4) : emprunter(Long livreId, String emailAdherent) — adhérent trouvé par
-// son email (« Aucun adhérent pour ce compte » sinon) ; rendre(Long empruntId, String utilisateur,
-// boolean bibliothecaire) — 404 si l'emprunt est celui d'un autre (sauf bibliothécaire) ;
-// deLAdherent(String email).
 @Service
 @Transactional(readOnly = true)
 public class EmpruntService {
@@ -34,33 +30,41 @@ public class EmpruntService {
         this.horloge = horloge;
     }
 
-    @Transactional                                   // tout ou rien
-    public EmpruntReponse emprunter(Long livreId, Long adherentId) {
+    @Transactional
+    public EmpruntReponse emprunter(Long livreId, String emailAdherent) {
         // Verrou sur la ligne du livre : deux emprunts simultanés du même livre passent l'un après l'autre.
         Livre livre = livres.findByIdPourMiseAJour(livreId)
                 .orElseThrow(() -> new RessourceIntrouvableException("Livre " + livreId + " introuvable"));
-        Adherent adherent = adherents.findById(adherentId)
-                .orElseThrow(() -> new RessourceIntrouvableException("Adhérent " + adherentId + " introuvable"));
+        Adherent adherent = adherents.findByEmail(emailAdherent)
+                .orElseThrow(() -> new RessourceIntrouvableException("Aucun adhérent pour ce compte"));
         EmpruntProperties.Regle regle = regles.pour(adherent.getCategorie());
 
         if (emprunts.existsByLivreIdAndDateRetourIsNull(livreId)) {
             throw new ConflitException("Ce livre est déjà emprunté");
         }
-        long enCours = emprunts.countByAdherentIdAndDateRetourIsNull(adherentId);
+        long enCours = emprunts.countByAdherentIdAndDateRetourIsNull(adherent.getId());
         if (enCours >= regle.maxEmprunts()) {
             throw new ConflitException("Limite de " + regle.maxEmprunts() + " emprunts atteinte");
         }
         Emprunt e = emprunts.save(new Emprunt(livre, adherent, LocalDate.now(horloge), regle.dureeJours()));
-        return EmpruntReponse.depuis(e);             // le DTO est construit DANS la transaction
+        return EmpruntReponse.depuis(e);
     }
 
     @Transactional
-    public RetourReponse rendre(Long empruntId) {
+    public RetourReponse rendre(Long empruntId, String utilisateur, boolean bibliothecaire) {
         Emprunt e = emprunts.findById(empruntId)
                 .orElseThrow(() -> new RessourceIntrouvableException("Emprunt " + empruntId + " introuvable"));
-        long retard = e.rendre(LocalDate.now(horloge));      // pas de save() : l'entité est suivie
+        if (!bibliothecaire && !e.getAdherent().getEmail().equals(utilisateur)) {
+            // 404 plutôt que 403 : ne pas révéler l'existence de l'emprunt d'un autre.
+            throw new RessourceIntrouvableException("Emprunt " + empruntId + " introuvable");
+        }
+        long retard = e.rendre(LocalDate.now(horloge));
         double penalite = retard * regles.pour(e.getAdherent().getCategorie()).penaliteParJour();
         return new RetourReponse(EmpruntReponse.depuis(e), retard, penalite);
+    }
+
+    public List<EmpruntReponse> deLAdherent(String email) {
+        return emprunts.findDeLAdherent(email).stream().map(EmpruntReponse::depuis).toList();
     }
 
     public List<EmpruntReponse> retards() {

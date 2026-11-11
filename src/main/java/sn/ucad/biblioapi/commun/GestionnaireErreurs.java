@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -55,10 +57,11 @@ public class GestionnaireErreurs extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(e, pb, headers, status, requete);
     }
 
-    // TODO ch11 : laisser passer AccessDeniedException et AuthenticationException (relancer)
-    // pour que Spring Security réponde lui-même 401 / 403.
     @ExceptionHandler(Exception.class)
-    public ProblemDetail inattendue(Exception e) {
+    public ProblemDetail inattendue(Exception e) throws Exception {
+        if (e instanceof AccessDeniedException || e instanceof AuthenticationException) {
+            throw e;
+        }
         log.error("Erreur inattendue", e);
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur interne");
     }
