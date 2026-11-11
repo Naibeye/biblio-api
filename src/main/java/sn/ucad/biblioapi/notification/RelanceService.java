@@ -1,12 +1,18 @@
 package sn.ucad.biblioapi.notification;
 
-// TODO ch04 (TP 2, étape 7) : bean « service » qui reçoit UN Notificateur par son constructeur.
-// Deux beans conviennent : lire l'erreur au démarrage, puis la corriger avec @Primary
-// (sur NotificateurEmail), puis avec @Qualifier("notificateurSms") au point d'injection.
+import org.springframework.stereotype.Service;
+
+@Service
 public class RelanceService {
+    private final Notificateur notificateur;
+
+    // Deux beans Notificateur existent : @Primary sur NotificateurEmail désigne celui-ci.
+    // Autre solution : public RelanceService(@Qualifier("notificateurSms") Notificateur notificateur)
+    public RelanceService(Notificateur notificateur) {
+        this.notificateur = notificateur;
+    }
 
     public String relancer(String destinataire) {
-        throw new UnsupportedOperationException(
-                "TODO ch04 : envoyer « Votre livre est à rendre demain. » et renvoyer le canal");
+        return notificateur.envoyer(destinataire, "Votre livre est à rendre demain.");
     }
 }

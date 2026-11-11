@@ -1,10 +1,16 @@
 package sn.ucad.biblioapi.notification;
 
-// TODO ch04 (TP 2, étape 7) : faire de cette implémentation un bean.
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+@Component
 public class NotificateurSms implements Notificateur {
+    private static final Logger log = LoggerFactory.getLogger(NotificateurSms.class);
 
     @Override
     public String envoyer(String destinataire, String message) {
-        throw new UnsupportedOperationException("TODO ch04 : journaliser l'envoi et renvoyer \"SMS\"");
+        log.info("SMS à {} : {}", destinataire, message);
+        return "SMS";
     }
 }

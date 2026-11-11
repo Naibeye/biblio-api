@@ -2,8 +2,9 @@ package sn.ucad.biblioapi.emprunt;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import org.springframework.stereotype.Service;
 
-// TODO ch04 (TP 2, étape 5) : déclarer cette classe comme bean de la couche « service ».
+@Service
 public class EmpruntService {
     private final Clock horloge;
 
@@ -12,6 +13,6 @@ public class EmpruntService {
     }
 
     public LocalDate dateRetourPrevue() {
-        throw new UnsupportedOperationException("TODO ch04 : aujourd'hui (selon l'horloge) + 14 jours");
+        return LocalDate.now(horloge).plusDays(14);
     }
 }

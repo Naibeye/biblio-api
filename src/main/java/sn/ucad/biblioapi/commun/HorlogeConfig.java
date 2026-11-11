@@ -1,11 +1,13 @@
 package sn.ucad.biblioapi.commun;
 
 import java.time.Clock;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-// TODO ch04 (TP 2, étape 5) : classe de configuration ; la méthode ci-dessous doit devenir un bean.
+@Configuration
 public class HorlogeConfig {
-
+    @Bean
     public Clock horloge() {
-        throw new UnsupportedOperationException("TODO ch04 : l'horloge du système");
+        return Clock.systemDefaultZone();
     }
 }

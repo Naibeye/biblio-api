@@ -1,30 +1,38 @@
 package sn.ucad.biblioapi.livre;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
-// TODO ch04 (TP 2, étape 1) : déclarer cette classe comme bean de la couche « dépôt ».
+@Repository
 public class LivreRepository {
-
-    // TODO ch04 : un Logger, et une Map<String, Livre> (clé : l'ISBN) sûre entre plusieurs fils.
+    private static final Logger log = LoggerFactory.getLogger(LivreRepository.class);
+    private final Map<String, Livre> livres = new ConcurrentHashMap<>();   // clé : l'ISBN
 
     public LivreRepository() {
-        // TODO ch04 : journaliser « 1. Construction de LivreRepository ».
+        log.info("1. Construction de LivreRepository");
     }
 
-    // TODO ch04 : une méthode @PostConstruct qui range trois livres d'exemple, puis journalise
-    //             « 2. @PostConstruct : 3 livres chargés ».
-    // TODO ch04 (étape 8) : une méthode @PreDestroy qui journalise l'arrêt du dépôt.
-
-    public List<Livre> findAll() {
-        throw new UnsupportedOperationException("TODO ch04 : tous les livres");
+    @PostConstruct                       // appelé une fois, juste après la construction
+    void chargerExemples() {
+        save(new Livre("978-2-07-036024-5", "L'Aventure ambiguë", 1961));
+        save(new Livre("978-2-84261-001-0", "Une si longue lettre", 1979));
+        save(new Livre("978-0-13-235088-4", "Clean Code", 2008));
+        log.info("2. @PostConstruct : {} livres chargés", livres.size());
     }
 
-    public Optional<Livre> findByIsbn(String isbn) {
-        throw new UnsupportedOperationException("TODO ch04 : le livre de cet ISBN");
+    @PreDestroy                          // appelé à l'arrêt de l'application
+    void fermer() {
+        log.info("Arrêt : LivreRepository libère ses ressources");
     }
 
-    public Livre save(Livre livre) {
-        throw new UnsupportedOperationException("TODO ch04 : ranger le livre (clé : son ISBN)");
-    }
+    public List<Livre> findAll()                   { return List.copyOf(livres.values()); }
+    public Optional<Livre> findByIsbn(String isbn) { return Optional.ofNullable(livres.get(isbn)); }
+    public Livre save(Livre livre)                 { livres.put(livre.isbn(), livre); return livre; }
 }

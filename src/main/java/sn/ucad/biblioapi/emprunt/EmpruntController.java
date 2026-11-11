@@ -1,6 +1,10 @@
 package sn.ucad.biblioapi.emprunt;
 
-// TODO ch04 (TP 2, étape 5) : contrôleur REST.
+import java.time.LocalDate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
 public class EmpruntController {
     private final EmpruntService service;
 
@@ -8,5 +12,8 @@ public class EmpruntController {
         this.service = service;
     }
 
-    // TODO ch04 : GET /api/emprunts/date-retour -> service.dateRetourPrevue()
+    @GetMapping("/api/emprunts/date-retour")
+    public LocalDate dateRetour() {
+        return service.dateRetourPrevue();
+    }
 }
