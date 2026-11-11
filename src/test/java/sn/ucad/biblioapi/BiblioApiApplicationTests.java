@@ -2,9 +2,10 @@ package sn.ucad.biblioapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-// TODO ch10 : utiliser le profil « test »
+@ActiveProfiles("test")
 class BiblioApiApplicationTests {
     @Test
     void contextLoads() {
