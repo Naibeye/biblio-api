@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+// TODO ch07 (TP 4, étape 1) : ne manipuler que des DTO — LivreRequete en entrée (avec @Valid),
+// LivreReponse en sortie. Les erreurs (404, 409) viennent des exceptions du service : les
+// ResponseEntity.notFound() disparaissent. PUT ne modifie que le titre et l'année.
 @RestController
 @RequestMapping("/api/livres")        // préfixe commun à toutes les méthodes de la classe
 public class LivreController {

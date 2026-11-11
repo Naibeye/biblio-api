@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
+// TODO ch07 (TP 4, étape 3) : lever RessourceIntrouvableException (livre inconnu) et
+// ConflitException (ISBN déjà utilisé) au lieu de renvoyer Optional ou boolean :
+//   Livre parId(Long id), Livre creer(String isbn, String titre, int annee),
+//   Livre modifier(Long id, String titre, int annee), void supprimer(Long id)
 @Service
 public class LivreService {
     private final LivreRepository depot;

@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+// TODO ch07 (TP 4, étape 5) : même démarche que pour les livres — AuteurRequete (nom obligatoire,
+// 100 caractères au plus ; nationalité 100 caractères au plus), AuteurReponse, ChangementNom validé,
+// exceptions levées par AuteurService.
 @RestController
 @RequestMapping("/api/auteurs")
 public class AuteurController {
