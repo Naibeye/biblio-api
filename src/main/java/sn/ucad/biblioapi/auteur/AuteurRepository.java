@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Repository;
 
+// TODO ch09 : remplacer par une interface JpaRepository<Auteur, Long> avec findByNationaliteIgnoreCase.
 @Repository
 public class AuteurRepository {
     private final Map<Long, Auteur> auteurs = new ConcurrentHashMap<>();

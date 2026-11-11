@@ -6,6 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import sn.ucad.biblioapi.commun.ConflitException;
 import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 
+// TODO ch09 (étape 5) : rechercher(titre, auteur, annee, pageable) -> PageReponse<LivreReponse>.
+// Avec open-in-view=false, renvoyer des LivreReponse construits DANS la transaction
+// (parId, creer, modifier), comme EmpruntService.
 @Service
 @Transactional(readOnly = true)
 public class LivreService {

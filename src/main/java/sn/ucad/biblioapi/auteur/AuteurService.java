@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 
+// TODO ch09 : service transactionnel sur le dépôt JPA (renommer modifie l'entité suivie).
 @Service
 public class AuteurService {
     private final AuteurRepository depot;

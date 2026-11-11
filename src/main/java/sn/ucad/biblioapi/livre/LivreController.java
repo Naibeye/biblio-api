@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+// TODO ch09 (étape 5) : GET /api/livres paginé (Pageable) avec titre, auteur et annee facultatifs ;
+// le service renvoie directement des LivreReponse.
 @RestController
 @RequestMapping("/api/livres")
 public class LivreController {

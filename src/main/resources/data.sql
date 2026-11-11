@@ -9,3 +9,6 @@ INSERT INTO livre (isbn, titre, annee) VALUES ('978-2-02-040318-0', 'Allah n''es
 INSERT INTO livre (isbn, titre, annee) VALUES ('978-2-84261-002-7', 'Un chant écarlate', 1981);
 INSERT INTO livre (isbn, titre, annee) VALUES ('978-0-13-449416-6', 'Clean Architecture', 2017);
 INSERT INTO livre (isbn, titre, annee) VALUES ('978-2-07-040321-9', 'Les Gardiens du temple', 1995);
+
+-- TODO ch09 (TP 6, étape 1) : cinq auteurs (avant les livres), la colonne auteur_id de chaque livre,
+-- et deux adhérents : Amina (amina@ucad.sn, ETUDIANT) et Hassan (hassan@ucad.sn, ENSEIGNANT).

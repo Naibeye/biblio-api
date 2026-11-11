@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+// TODO ch09 : DataIntegrityViolationException -> 409 (ex. supprimer un auteur qui a des livres) ;
+// PropertyReferenceException et InvalidDataAccessApiUsageException (tri inconnu) -> 400.
 @RestControllerAdvice
 public class GestionnaireErreurs extends ResponseEntityExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GestionnaireErreurs.class);

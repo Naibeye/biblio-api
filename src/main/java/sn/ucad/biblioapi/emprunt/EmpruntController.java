@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sn.ucad.biblioapi.adherent.Categorie;
 
+// TODO ch09 : POST /api/emprunts (201 + Location), POST /api/emprunts/{id}/retour,
+// GET /api/emprunts/retards ; la route date-retour disparaît.
 @RestController
 public class EmpruntController {
     private final EmpruntService service;
