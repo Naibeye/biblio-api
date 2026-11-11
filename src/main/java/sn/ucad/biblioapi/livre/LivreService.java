@@ -1,13 +1,10 @@
 package sn.ucad.biblioapi.livre;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
+import sn.ucad.biblioapi.commun.ConflitException;
+import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 
-// TODO ch07 (TP 4, étape 3) : lever RessourceIntrouvableException (livre inconnu) et
-// ConflitException (ISBN déjà utilisé) au lieu de renvoyer Optional ou boolean :
-//   Livre parId(Long id), Livre creer(String isbn, String titre, int annee),
-//   Livre modifier(Long id, String titre, int annee), void supprimer(Long id)
 @Service
 public class LivreService {
     private final LivreRepository depot;
@@ -22,20 +19,28 @@ public class LivreService {
                 .toList();
     }
 
-    public Optional<Livre> parId(Long id) { return depot.findById(id); }
-
-    public Livre creer(Livre livre) {
-        return depot.save(livre.avecId(null));      // l'id éventuellement envoyé est ignoré
+    public Livre parId(Long id) {
+        return depot.findById(id)
+                .orElseThrow(() -> new RessourceIntrouvableException("Livre " + id + " introuvable"));
     }
 
-    public Optional<Livre> remplacer(Long id, Livre livre) {
-        if (!depot.existsById(id)) return Optional.empty();
-        return Optional.of(depot.save(livre.avecId(id)));
+    public Livre creer(String isbn, String titre, int annee) {
+        boolean dejaPris = depot.findAll().stream().anyMatch(l -> l.isbn().equals(isbn));
+        if (dejaPris) {
+            throw new ConflitException("L'ISBN " + isbn + " est déjà utilisé");
+        }
+        return depot.save(new Livre(null, isbn, titre, annee));
     }
 
-    public boolean supprimer(Long id) {
-        if (!depot.existsById(id)) return false;
+    public Livre modifier(Long id, String titre, int annee) {      // l'ISBN ne change pas
+        Livre livre = parId(id);
+        return depot.save(new Livre(id, livre.isbn(), titre, annee));
+    }
+
+    public void supprimer(Long id) {
+        if (!depot.existsById(id)) {
+            throw new RessourceIntrouvableException("Livre " + id + " introuvable");
+        }
         depot.deleteById(id);
-        return true;
     }
 }
