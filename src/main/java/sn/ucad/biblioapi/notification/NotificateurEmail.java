@@ -1,5 +1,6 @@
 package sn.ucad.biblioapi.notification;
 
+// TODO ch13 : code de démonstration des chapitres 3 à 5, à retirer du projet livré.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
