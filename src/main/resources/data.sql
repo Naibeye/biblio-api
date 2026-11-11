@@ -1,3 +1,4 @@
+-- TODO ch12 (TP 9, étape 3) : déplacer ces données dans db/demo/V100__donnees_de_demo.sql, puis supprimer ce fichier
 -- Données de départ, chargées au démarrage (base H2 en mémoire)
 INSERT INTO auteur (nom, nationalite) VALUES ('Robert C. Martin', 'américaine');
 INSERT INTO auteur (nom, nationalite) VALUES ('Cheikh Hamidou Kane', 'sénégalaise');

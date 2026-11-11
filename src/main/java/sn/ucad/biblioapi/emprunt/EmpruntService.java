@@ -12,6 +12,8 @@ import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 import sn.ucad.biblioapi.livre.Livre;
 import sn.ucad.biblioapi.livre.LivreRepository;
 
+// TODO ch12 (TP 9, étape 1) : un Logger ; journaliser « Emprunt {} créé, retour prévu le {} » et,
+// au retour, le nombre de jours de retard.
 @Service
 @Transactional(readOnly = true)
 public class EmpruntService {

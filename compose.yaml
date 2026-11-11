@@ -1,0 +1,5 @@
+# TODO ch12 (TP 9, étape 4) : deux services.
+#   base : postgres:16, base « biblio », utilisateur « biblio », mot de passe ${DB_PASSWORD} (obligatoire),
+#          données dans un volume nommé, healthcheck pg_isready ;
+#   api  : construite depuis le Dockerfile, port 8080, profil prod, DB_URL vers le service base,
+#          DB_PASSWORD et JWT_SECRET obligatoires, démarre quand la base est prête.

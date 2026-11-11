@@ -30,6 +30,9 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
+		<!-- TODO ch12 (TP 9, étape 2) : ajouter spring-boot-starter-actuator (et -actuator-test) -->
+		<!-- TODO ch12 (TP 9, étape 3) : ajouter spring-boot-starter-flyway (et -flyway-test) et org.flywaydb:flyway-database-postgresql -->
+		<!-- TODO ch12 : version 1.0.0 pour la livraison -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-h2console</artifactId>
