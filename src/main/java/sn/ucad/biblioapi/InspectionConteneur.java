@@ -6,9 +6,10 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
-// TODO ch05 (TP 2 bis, étape 6) : ne créer cette classe qu'en profil dev
+@Profile("dev")                      // l'inventaire n'est utile qu'en développement
 public class InspectionConteneur {
     private static final Logger log = LoggerFactory.getLogger(InspectionConteneur.class);
 

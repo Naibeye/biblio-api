@@ -6,8 +6,7 @@ import org.springframework.stereotype.Service;
 public class RelanceService {
     private final Notificateur notificateur;
 
-    // Deux beans Notificateur existent : @Primary sur NotificateurEmail désigne celui-ci.
-    // Autre solution : public RelanceService(@Qualifier("notificateurSms") Notificateur notificateur)
+    // Un seul notificateur existe : celui choisi par biblio.notification.canal (email par défaut).
     public RelanceService(Notificateur notificateur) {
         this.notificateur = notificateur;
     }

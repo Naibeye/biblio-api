@@ -2,10 +2,11 @@ package sn.ucad.biblioapi.notification;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-// TODO ch05 (TP 2 bis, étape 7) : créer ce bean seulement si biblio.notification.canal=sms
 @Component
+@ConditionalOnProperty(name = "biblio.notification.canal", havingValue = "sms")
 public class NotificateurSms implements Notificateur {
     private static final Logger log = LoggerFactory.getLogger(NotificateurSms.class);
 

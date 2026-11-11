@@ -3,19 +3,19 @@ package sn.ucad.biblioapi.emprunt;
 import java.time.Clock;
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
+import sn.ucad.biblioapi.adherent.Categorie;
 
 @Service
 public class EmpruntService {
-    // TODO ch05 (TP 2 bis, étape 1) : recevoir aussi EmpruntProperties par le constructeur.
+    private final EmpruntProperties regles;
     private final Clock horloge;
 
-    public EmpruntService(Clock horloge) {
+    public EmpruntService(EmpruntProperties regles, Clock horloge) {
+        this.regles = regles;
         this.horloge = horloge;
     }
 
-    // TODO ch05 : dateRetourPrevue(Categorie categorie), avec la durée lue dans la règle
-    // de la catégorie au lieu de 14 jours écrits en dur.
-    public LocalDate dateRetourPrevue() {
-        return LocalDate.now(horloge).plusDays(14);
+    public LocalDate dateRetourPrevue(Categorie categorie) {
+        return LocalDate.now(horloge).plusDays(regles.pour(categorie).dureeJours());
     }
 }
