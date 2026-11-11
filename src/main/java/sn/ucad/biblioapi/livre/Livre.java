@@ -1,11 +1,46 @@
 package sn.ucad.biblioapi.livre;
 
-// TODO ch08 (TP 5, étape 1) : transformer ce record en entité JPA (une classe) : table « livre »,
-// id généré par la base, isbn obligatoire et unique (20 caractères), titre obligatoire (200),
-// constructeur protégé sans argument, getters, méthode modifier(titre, annee).
-public record Livre(Long id, String isbn, String titre, int annee) {
-    // Renvoie une copie avec un autre identifiant (un record est immuable).
-    public Livre avecId(Long nouvelId) {
-        return new Livre(nouvelId, isbn, titre, annee);
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
+public class Livre {
+    public static final int ANNEE_RECENT = 2020;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true, length = 20)
+    private String isbn;
+
+    @Column(nullable = false, length = 200)
+    private String titre;
+
+    private Integer annee;
+
+    protected Livre() { }
+
+    public Livre(String isbn, String titre, Integer annee) {
+        this.isbn = isbn;
+        this.titre = titre;
+        this.annee = annee;
+    }
+
+    public Long getId() { return id; }
+    public String getIsbn() { return isbn; }
+    public String getTitre() { return titre; }
+    public Integer getAnnee() { return annee; }
+
+    public boolean estRecent() {
+        return annee != null && annee >= ANNEE_RECENT;
+    }
+
+    public void modifier(String titre, Integer annee) {
+        this.titre = titre;
+        this.annee = annee;
     }
 }

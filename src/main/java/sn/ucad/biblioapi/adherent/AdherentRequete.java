@@ -1,5 +1,11 @@
 package sn.ucad.biblioapi.adherent;
 
-// TODO ch08 : contraintes — nom obligatoire (2 à 100 caractères), email obligatoire et valide,
-// catégorie obligatoire.
-public record AdherentRequete(String nom, String email, Categorie categorie) { }
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+public record AdherentRequete(
+        @NotBlank @Size(min = 2, max = 100) String nom,
+        @NotBlank @Email String email,
+        @NotNull Categorie categorie) { }

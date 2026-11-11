@@ -39,7 +39,7 @@ public class LivreController {
     public ResponseEntity<LivreReponse> creer(@Valid @RequestBody LivreRequete requete) {
         Livre cree = service.creer(requete.isbn(), requete.titre(), requete.annee());
         URI adresse = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(cree.id()).toUri();
+                .path("/{id}").buildAndExpand(cree.getId()).toUri();
         return ResponseEntity.created(adresse).body(LivreReponse.depuis(cree));
     }
 

@@ -1,5 +1,8 @@
 package sn.ucad.biblioapi.adherent;
 
-// TODO ch08 : étendre JpaRepository<Adherent, Long> ; ajouter findByEmail.
-public interface AdherentRepository {
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AdherentRepository extends JpaRepository<Adherent, Long> {
+    Optional<Adherent> findByEmail(String email);
 }

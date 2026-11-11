@@ -2,23 +2,25 @@ package sn.ucad.biblioapi.livre;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sn.ucad.biblioapi.commun.ConflitException;
 import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 
-// TODO ch08 (TP 5) : utiliser le dépôt JPA (existsByIsbn, findByTitreContainingIgnoreCase),
-// les getters de l'entité, et des transactions (@Transactional) pour les écritures.
 @Service
+@Transactional(readOnly = true)
 public class LivreService {
     private final LivreRepository depot;
 
-    public LivreService(LivreRepository depot) { this.depot = depot; }
+    public LivreService(LivreRepository depot) {
+        this.depot = depot;
+    }
 
-    public List<Livre> tous() { return depot.findAll(); }
+    public List<Livre> tous() {
+        return depot.findAll();
+    }
 
     public List<Livre> rechercher(String motDansTitre) {
-        return depot.findAll().stream()
-                .filter(l -> l.titre().toLowerCase().contains(motDansTitre.toLowerCase()))
-                .toList();
+        return depot.findByTitreContainingIgnoreCase(motDansTitre);
     }
 
     public Livre parId(Long id) {
@@ -26,23 +28,23 @@ public class LivreService {
                 .orElseThrow(() -> new RessourceIntrouvableException("Livre " + id + " introuvable"));
     }
 
-    public Livre creer(String isbn, String titre, int annee) {
-        boolean dejaPris = depot.findAll().stream().anyMatch(l -> l.isbn().equals(isbn));
-        if (dejaPris) {
+    @Transactional
+    public Livre creer(String isbn, String titre, Integer annee) {
+        if (depot.existsByIsbn(isbn)) {
             throw new ConflitException("L'ISBN " + isbn + " est déjà utilisé");
         }
-        return depot.save(new Livre(null, isbn, titre, annee));
+        return depot.save(new Livre(isbn, titre, annee));
     }
 
-    public Livre modifier(Long id, String titre, int annee) {      // l'ISBN ne change pas
+    @Transactional
+    public Livre modifier(Long id, String titre, Integer annee) {
         Livre livre = parId(id);
-        return depot.save(new Livre(id, livre.isbn(), titre, annee));
+        livre.modifier(titre, annee);           // entité suivie : mise à jour à la fin de la transaction
+        return livre;
     }
 
+    @Transactional
     public void supprimer(Long id) {
-        if (!depot.existsById(id)) {
-            throw new RessourceIntrouvableException("Livre " + id + " introuvable");
-        }
-        depot.deleteById(id);
+        depot.delete(parId(id));
     }
 }
