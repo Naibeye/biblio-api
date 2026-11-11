@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Repository;
 
+// TODO ch08 (TP 5, étapes 1 et 4) : remplacer cette classe par une interface qui étend
+// JpaRepository<Livre, Long>, avec existsByIsbn et findByTitreContainingIgnoreCase.
 @Repository
 public class LivreRepository {
     private final Map<Long, Livre> livres = new ConcurrentHashMap<>();

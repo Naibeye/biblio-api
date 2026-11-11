@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import sn.ucad.biblioapi.commun.ConflitException;
 import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 
+// TODO ch08 (TP 5) : utiliser le dépôt JPA (existsByIsbn, findByTitreContainingIgnoreCase),
+// les getters de l'entité, et des transactions (@Transactional) pour les écritures.
 @Service
 public class LivreService {
     private final LivreRepository depot;

@@ -30,6 +30,8 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
+		<!-- TODO ch08 (TP 5, étape 1) : ajouter spring-boot-starter-data-jpa (et -data-jpa-test), h2 (runtime) et spring-boot-h2console -->
+		<!-- TODO ch08 : ajouter le pilote PostgreSQL (org.postgresql:postgresql, runtime) pour le profil prod -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
