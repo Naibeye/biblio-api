@@ -52,3 +52,29 @@ git diff ch08-debut ch08-fin          # comparer avec le corrigé (après avoir 
 ./mvnw spring-boot:run                                       # chapitres 3 à 7
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev        # à partir du chapitre 8
 ```
+
+## Le projet livré (fin du chapitre 13)
+
+```bash
+./mvnw test                                              # 20 tests
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev    # H2 en mémoire, données de démonstration
+```
+
+En dev : Swagger sur `http://localhost:8080/swagger-ui.html`, console H2 sur
+`http://localhost:8080/h2-console` (URL `jdbc:h2:mem:biblio`, utilisateur `sa`).
+
+| Compte | Mot de passe | Rôle |
+| --- | --- | --- |
+| `amina@ucad.sn` | `amina-2026` | adhérente (étudiante) |
+| `hassan@ucad.sn` | `hassan-2026` | adhérent (enseignant) |
+| `moussa@ucad.sn` | `moussa-2026` | bibliothécaire |
+
+Avec Docker (profil prod, PostgreSQL 16, schéma créé par Flyway, sans données de démonstration) :
+
+```bash
+cp .env.example .env    # remplir DB_PASSWORD et JWT_SECRET (openssl rand -base64 48)
+docker compose up --build
+```
+
+Le fichier `parcours.http` (IntelliJ ou extension REST Client de VS Code) déroule le parcours
+principal : catalogue, jeton, emprunt, retour, retards.
