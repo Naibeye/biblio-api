@@ -24,6 +24,8 @@ import sn.ucad.biblioapi.commun.ConflitException;
 import sn.ucad.biblioapi.livre.Livre;
 import sn.ucad.biblioapi.livre.LivreRepository;
 
+// TODO ch11 : adapter à emprunter(livreId, email) et rendre(empruntId, utilisateur, bibliothecaire) ;
+// ajouter on_ne_rend_pas_l_emprunt_d_un_autre.
 @ExtendWith(MockitoExtension.class)
 class EmpruntServiceTest {
 

@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+// TODO ch11 : créer un livre demande le rôle BIBLIOTHECAIRE (@WithMockUser).
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")

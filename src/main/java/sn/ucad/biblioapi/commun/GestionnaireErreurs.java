@@ -55,6 +55,8 @@ public class GestionnaireErreurs extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(e, pb, headers, status, requete);
     }
 
+    // TODO ch11 : laisser passer AccessDeniedException et AuthenticationException (relancer)
+    // pour que Spring Security réponde lui-même 401 / 403.
     @ExceptionHandler(Exception.class)
     public ProblemDetail inattendue(Exception e) {
         log.error("Erreur inattendue", e);

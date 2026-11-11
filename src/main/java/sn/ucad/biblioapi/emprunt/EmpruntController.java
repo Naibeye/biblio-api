@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+// TODO ch11 (TP 8a, étape 4) : recevoir Authentication — emprunter pour utilisateur.getName()
+// (l'email connecté) ; rendre en précisant si la personne est bibliothécaire ;
+// GET /api/moi/emprunts -> les emprunts de la personne connectée.
 @RestController
 public class EmpruntController {
     private final EmpruntService service;

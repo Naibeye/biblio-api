@@ -18,6 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import sn.ucad.biblioapi.commun.ConflitException;
 import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 
+// TODO ch11 (TP 8a, étape 5) : importer SecuriteConfig, profil « test » ; @WithMockUser(roles =
+// "BIBLIOTHECAIRE") sur les tests qui créent ; ajouter les tests 401 (anonyme), 403 (adhérent)
+// et 204 (bibliothécaire) sur DELETE /api/livres/1.
 @WebMvcTest(LivreController.class)
 class LivreControllerTest {
 

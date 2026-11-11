@@ -13,6 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+// TODO ch11 : chaque requête avec un utilisateur simulé — .with(user("moussa@ucad.sn").roles("BIBLIOTHECAIRE"))
+// pour le livre et l'adhérent, l'adhérente elle-même pour emprunter et rendre ; vérifier qu'un autre
+// adhérent reçoit 404 en voulant rendre son emprunt.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")

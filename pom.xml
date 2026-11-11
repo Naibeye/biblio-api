@@ -30,6 +30,8 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
+		<!-- TODO ch11 (TP 8a, étape 1) : ajouter spring-boot-starter-security (et spring-boot-starter-security-test) -->
+		<!-- TODO ch11 (TP 8b, étape 1) : ajouter spring-boot-starter-security-oauth2-resource-server (et son -test) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-h2console</artifactId>

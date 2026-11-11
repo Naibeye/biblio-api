@@ -12,6 +12,10 @@ import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 import sn.ucad.biblioapi.livre.Livre;
 import sn.ucad.biblioapi.livre.LivreRepository;
 
+// TODO ch11 (TP 8a, étape 4) : emprunter(Long livreId, String emailAdherent) — adhérent trouvé par
+// son email (« Aucun adhérent pour ce compte » sinon) ; rendre(Long empruntId, String utilisateur,
+// boolean bibliothecaire) — 404 si l'emprunt est celui d'un autre (sauf bibliothécaire) ;
+// deLAdherent(String email).
 @Service
 @Transactional(readOnly = true)
 public class EmpruntService {

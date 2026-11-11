@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+// TODO ch11 : findDeLAdherent(String email) — les emprunts d'un adhérent, avec livre et adhérent (join fetch).
 public interface EmpruntRepository extends JpaRepository<Emprunt, Long> {
 
     boolean existsByLivreIdAndDateRetourIsNull(Long livreId);
