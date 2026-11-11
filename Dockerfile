@@ -1,5 +1,17 @@
-# TODO ch12 (TP 9, étape 4) : deux étapes.
-#   1. construction (eclipse-temurin:17-jdk) : copier mvnw, pom.xml et .mvn, télécharger les
-#      dépendances (dependency:go-offline), puis copier src et faire le package sans les tests ;
-#   2. exécution (eclipse-temurin:17-jre) : un utilisateur système « appli » (pas root), le jar
-#      copié depuis l'étape 1, port 8080, ENTRYPOINT java -jar.
+# Étape 1 : construire le jar (JDK). Les dépendances d'abord, pour profiter du cache Docker.
+FROM eclipse-temurin:17-jdk AS construction
+WORKDIR /app
+COPY mvnw pom.xml ./
+COPY .mvn .mvn
+RUN chmod +x mvnw && ./mvnw -q dependency:go-offline
+COPY src src
+RUN ./mvnw -q clean package -DskipTests
+
+# Étape 2 : une image légère (JRE), qui ne tourne pas en root.
+FROM eclipse-temurin:17-jre
+RUN groupadd --system appli && useradd --system --gid appli --no-create-home appli
+WORKDIR /app
+COPY --from=construction /app/target/*.jar app.jar
+USER appli
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]

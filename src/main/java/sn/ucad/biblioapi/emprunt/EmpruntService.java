@@ -3,6 +3,8 @@ package sn.ucad.biblioapi.emprunt;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sn.ucad.biblioapi.adherent.Adherent;
@@ -12,11 +14,11 @@ import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
 import sn.ucad.biblioapi.livre.Livre;
 import sn.ucad.biblioapi.livre.LivreRepository;
 
-// TODO ch12 (TP 9, étape 1) : un Logger ; journaliser « Emprunt {} créé, retour prévu le {} » et,
-// au retour, le nombre de jours de retard.
 @Service
 @Transactional(readOnly = true)
 public class EmpruntService {
+    private static final Logger log = LoggerFactory.getLogger(EmpruntService.class);
+
     private final EmpruntRepository emprunts;
     private final LivreRepository livres;
     private final AdherentRepository adherents;
@@ -49,6 +51,7 @@ public class EmpruntService {
             throw new ConflitException("Limite de " + regle.maxEmprunts() + " emprunts atteinte");
         }
         Emprunt e = emprunts.save(new Emprunt(livre, adherent, LocalDate.now(horloge), regle.dureeJours()));
+        log.info("Emprunt {} créé, retour prévu le {}", e.getId(), e.getDateRetourPrevue());
         return EmpruntReponse.depuis(e);
     }
 
@@ -62,6 +65,7 @@ public class EmpruntService {
         }
         long retard = e.rendre(LocalDate.now(horloge));
         double penalite = retard * regles.pour(e.getAdherent().getCategorie()).penaliteParJour();
+        log.info("Emprunt {} rendu avec {} jour(s) de retard", e.getId(), retard);
         return new RetourReponse(EmpruntReponse.depuis(e), retard, penalite);
     }
 

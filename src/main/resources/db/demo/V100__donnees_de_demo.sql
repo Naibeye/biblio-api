@@ -1,11 +1,9 @@
--- TODO ch12 (TP 9, étape 3) : déplacer ces données dans db/demo/V100__donnees_de_demo.sql, puis supprimer ce fichier
--- Données de départ, chargées au démarrage (base H2 en mémoire)
+-- Données de démonstration : chargées seulement par le profil dev.
 INSERT INTO auteur (nom, nationalite) VALUES ('Robert C. Martin', 'américaine');
 INSERT INTO auteur (nom, nationalite) VALUES ('Cheikh Hamidou Kane', 'sénégalaise');
 INSERT INTO auteur (nom, nationalite) VALUES ('Mariama Bâ', 'sénégalaise');
 INSERT INTO auteur (nom, nationalite) VALUES ('Ousmane Sembène', 'sénégalaise');
 INSERT INTO auteur (nom, nationalite) VALUES ('Ahmadou Kourouma', 'ivoirienne');
-
 INSERT INTO livre (isbn, titre, annee, auteur_id) VALUES ('978-2-1234', 'Clean Code', 2008, 1);
 INSERT INTO livre (isbn, titre, annee, auteur_id) VALUES ('978-2-5678', 'Spring en action', 2022, NULL);
 INSERT INTO livre (isbn, titre, annee, auteur_id) VALUES ('978-2-07-036024-5', 'L''Aventure ambiguë', 1961, 2);
@@ -16,11 +14,9 @@ INSERT INTO livre (isbn, titre, annee, auteur_id) VALUES ('978-2-02-040318-0', '
 INSERT INTO livre (isbn, titre, annee, auteur_id) VALUES ('978-2-84261-002-7', 'Un chant écarlate', 1981, 3);
 INSERT INTO livre (isbn, titre, annee, auteur_id) VALUES ('978-0-13-449416-6', 'Clean Architecture', 2017, 1);
 INSERT INTO livre (isbn, titre, annee, auteur_id) VALUES ('978-2-07-040321-9', 'Les Gardiens du temple', 1995, 2);
-
 INSERT INTO adherent (nom, email, categorie) VALUES ('Amina', 'amina@ucad.sn', 'ETUDIANT');
 INSERT INTO adherent (nom, email, categorie) VALUES ('Hassan', 'hassan@ucad.sn', 'ENSEIGNANT');
-
--- Comptes de démonstration. Mots de passe : amina-2026, moussa-2026, hassan-2026 (empreintes BCrypt)
+-- Mots de passe de démonstration : amina-2026, moussa-2026, hassan-2026 (empreintes BCrypt)
 INSERT INTO utilisateur (identifiant, empreinte, role) VALUES
   ('amina@ucad.sn',  '$2a$10$UuNaL5o89IXDlOGS9jYRbuA4vMxN8KX6tB3tLjttEPZX4pLsV/ity', 'ADHERENT'),
   ('moussa@ucad.sn', '$2a$10$v4HDyrMtnpfb97z2koL90eDbDWA54ISgcvhKPmssdScscvOlmiHfW', 'BIBLIOTHECAIRE'),

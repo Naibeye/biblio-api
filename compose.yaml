@@ -1,5 +1,29 @@
-# TODO ch12 (TP 9, étape 4) : deux services.
-#   base : postgres:16, base « biblio », utilisateur « biblio », mot de passe ${DB_PASSWORD} (obligatoire),
-#          données dans un volume nommé, healthcheck pg_isready ;
-#   api  : construite depuis le Dockerfile, port 8080, profil prod, DB_URL vers le service base,
-#          DB_PASSWORD et JWT_SECRET obligatoires, démarre quand la base est prête.
+services:
+  base:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: biblio
+      POSTGRES_USER: biblio
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD manquant}
+    volumes:
+      - donnees:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U biblio"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://base:5432/biblio
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD manquant}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET manquant}
+    depends_on:
+      base:
+        condition: service_healthy
+
+volumes:
+  donnees:
