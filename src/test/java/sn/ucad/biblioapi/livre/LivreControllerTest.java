@@ -21,11 +21,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sn.ucad.biblioapi.commun.ConflitException;
 import sn.ucad.biblioapi.commun.RessourceIntrouvableException;
+import sn.ucad.biblioapi.securite.JwtConfig;
 import sn.ucad.biblioapi.securite.SecuriteConfig;
 
 @WebMvcTest(LivreController.class)
-// TODO ch11 (TP 8b, étape 5) : importer aussi JwtConfig
-@Import(SecuriteConfig.class)
+@Import({SecuriteConfig.class, JwtConfig.class})
 @ActiveProfiles("test")
 class LivreControllerTest {
 

@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -16,7 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecuriteConfig {
 
     @Bean
-    public SecurityFilterChain filtres(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filtres(HttpSecurity http, JwtAuthenticationConverter convertisseurJwt)
+            throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -37,9 +39,8 @@ public class SecuriteConfig {
                 .requestMatchers("/api/emprunts/**").authenticated()
                 // 5. Tout le reste est refusé
                 .anyRequest().denyAll())
-            // TODO ch11 (TP 8b, étape 2) : accepter aussi les jetons JWT — oauth2ResourceServer avec le
-            // JwtAuthenticationConverter de JwtConfig, reçu en paramètre de cette méthode.
-            .httpBasic(Customizer.withDefaults());   // identifiant + mot de passe à chaque requête
+            .httpBasic(Customizer.withDefaults())
+            .oauth2ResourceServer(o -> o.jwt(jwt -> jwt.jwtAuthenticationConverter(convertisseurJwt)));
         return http.build();
     }
 
