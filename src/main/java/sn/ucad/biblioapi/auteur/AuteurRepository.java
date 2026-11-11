@@ -1,6 +1,25 @@
 package sn.ucad.biblioapi.auteur;
 
-// TODO ch06 (TP 3, étape 1) : dépôt en mémoire, sur le modèle de LivreRepository
-// (findAll, findById, existsById, deleteById, save avec un compteur d'identifiants).
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.stereotype.Repository;
+
+@Repository
 public class AuteurRepository {
+    private final Map<Long, Auteur> auteurs = new ConcurrentHashMap<>();
+    private final AtomicLong compteur = new AtomicLong();
+
+    public List<Auteur> findAll()             { return List.copyOf(auteurs.values()); }
+    public Optional<Auteur> findById(Long id) { return Optional.ofNullable(auteurs.get(id)); }
+    public boolean existsById(Long id)        { return auteurs.containsKey(id); }
+    public void deleteById(Long id)           { auteurs.remove(id); }
+
+    public Auteur save(Auteur auteur) {
+        Auteur aRanger = auteur.id() == null ? auteur.avecId(compteur.incrementAndGet()) : auteur;
+        auteurs.put(aRanger.id(), aRanger);
+        return aRanger;
+    }
 }

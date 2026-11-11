@@ -10,27 +10,28 @@ public class LivreService {
 
     public LivreService(LivreRepository depot) { this.depot = depot; }
 
-    public List<Livre> tous() {
-        throw new UnsupportedOperationException("TODO ch06 : tous les livres");
-    }
+    public List<Livre> tous() { return depot.findAll(); }
 
     public List<Livre> rechercher(String motDansTitre) {
-        throw new UnsupportedOperationException("TODO ch06 : les livres dont le titre contient le mot (sans tenir compte de la casse)");
+        return depot.findAll().stream()
+                .filter(l -> l.titre().toLowerCase().contains(motDansTitre.toLowerCase()))
+                .toList();
     }
 
-    public Optional<Livre> parId(Long id) {
-        throw new UnsupportedOperationException("TODO ch06 : le livre, s'il existe");
-    }
+    public Optional<Livre> parId(Long id) { return depot.findById(id); }
 
     public Livre creer(Livre livre) {
-        throw new UnsupportedOperationException("TODO ch06 : enregistrer le livre en ignorant l'id éventuellement envoyé");
+        return depot.save(livre.avecId(null));      // l'id éventuellement envoyé est ignoré
     }
 
     public Optional<Livre> remplacer(Long id, Livre livre) {
-        throw new UnsupportedOperationException("TODO ch06 : remplacer le livre s'il existe (vide sinon)");
+        if (!depot.existsById(id)) return Optional.empty();
+        return Optional.of(depot.save(livre.avecId(id)));
     }
 
     public boolean supprimer(Long id) {
-        throw new UnsupportedOperationException("TODO ch06 : supprimer ; renvoyer false si le livre n'existe pas");
+        if (!depot.existsById(id)) return false;
+        depot.deleteById(id);
+        return true;
     }
 }
